@@ -43,24 +43,22 @@
 		$stmt->bindColumn($db_columnUser, $realUser);
 		$stmt->fetch();
 	} else if($crypt == 'hash_xenforo') {
-		
+
 		$stmt = $db->prepare("SELECT scheme_class, $db_table.$db_columnId,$db_table.$db_columnUser,$db_tableOther.$db_columnId,$db_tableOther.$db_columnPass FROM $db_table, $db_tableOther WHERE $db_table.$db_columnId = $db_tableOther.$db_columnId AND $db_table.$db_columnUser= :login");
 		$stmt->bindValue(':login', $login);
 		$stmt->execute();
-		$stmt->bindColumn($db_columnPass, $salt);
 		$stmt->bindColumn($db_columnUser, $realUser);
-		$stmt->fetch();
-		$stmt->execute();
-		$stmt->bindColumn($db_columnPass, $realPass);
+		$stmt->bindColumn($db_columnPass, $rPass);
 		$stmt->bindColumn('scheme_class', $scheme_class);
 		$stmt->fetch();	
-		$realPass = substr($realPass,22,64);
+		$realPass = unserialize($rPass)['hash'];
 		if($scheme_class==='XenForo_Authentication_Core') {
-			$salt = substr($salt,105,64);
+			$salt = unserialize($rPass)['salt'];
 		} else $salt = false;
 	} else die(Security::encrypt("badhash<$>", $key1));
 
 	$checkPass = hash_name($crypt, $realPass, $postPass, @$salt);
+	if($checkPass !=  $realPass)  die(Security::encrypt('errorLogin<$>', $key1));
 
 	if($useantibrut) {	
 		$ip  = getenv('REMOTE_ADDR');	
