@@ -51,9 +51,10 @@
 		$stmt->bindColumn($db_columnPass, $rPass);
 		$stmt->bindColumn('scheme_class', $scheme_class);
 		$stmt->fetch();	
-		$realPass = unserialize($rPass)['hash'];
+		$pass = unserialize($rPass);
+		$realPass = $pass['hash'];
 		if($scheme_class==='XenForo_Authentication_Core') {
-			$salt = unserialize($rPass)['salt'];
+			$salt = $pass['salt'];
 		} else $salt = false;
 	} else die(Security::encrypt("badhash<$>", $key1));
 
