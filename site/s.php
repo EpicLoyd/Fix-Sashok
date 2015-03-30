@@ -11,7 +11,6 @@ $stmt->bindColumn('user', $realUser);
 $stmt->fetch();
 $time = time();
 $file = $capeurl.$realUser.'.png';
-$file_headers = @get_headers($file);
 $exists = remoteFileExists($file);
 if ($exists) {
     $cape = 
